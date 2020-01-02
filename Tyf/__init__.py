@@ -516,7 +516,7 @@ else:
 
 		def save(self, fp, format="JPEG", **params):
 
-			ifd = params.pop("ifd", self._getexif())
+			ifd = params.pop("ifd", self.getexif())
 			if ifd:
 				fileobj = StringIO()
 				if isinstance(ifd, TiffFile):

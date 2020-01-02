@@ -493,45 +493,45 @@ def open(f):
 
 
 # if PIL exists do some overridings
-try: from PIL import Image as _Image
-except ImportError: pass
-else:
-	def _getexif(im):
-		try:
-			data = im.info["exif"]
-		except KeyError:
-			return None
-		fileobj = io.BytesIO(data[6:])
-		exif = TiffFile(fileobj)
-		fileobj.close()
-		return exif
+# try: from PIL import Image as _Image
+# except ImportError: pass
+# else:
+# 	def _getexif(im):
+# 		try:
+# 			data = im.info["exif"]
+# 		except KeyError:
+# 			return None
+# 		fileobj = io.BytesIO(data[6:])
+# 		exif = TiffFile(fileobj)
+# 		fileobj.close()
+# 		return exif
 
-	class Image(_Image.Image):
+# 	class Image(_Image.Image):
 
-		_image_ = _Image.Image
+# 		_image_ = _Image.Image
 
-		@staticmethod
-		def open(*args, **kwargs):
-			return _Image.open(*args, **kwargs)
+# 		@staticmethod
+# 		def open(*args, **kwargs):
+# 			return _Image.open(*args, **kwargs)
 
-		def save(self, fp, format="JPEG", **params):
+# 		def save(self, fp, format="JPEG", **params):
 
-			ifd = params.pop("ifd", self.getexif())
-			if ifd:
-				fileobj = StringIO()
-				if isinstance(ifd, TiffFile):
-					ifd.load_raster()
-					ifd.save(fileobj)
-				elif isinstance(ifd, JpegFile):
-					ifd[0xffe1].save(fileobj)
-				data = fileobj.getvalue()
-				fileobj.close()
-				if len(data) > 0:
-					params["exif"] = b"Exif\x00\x00" + (data.encode() if isinstance(data, str) else data)
+# 			ifd = params.pop("ifd", self.getexif())
+# 			if ifd:
+# 				fileobj = StringIO()
+# 				if isinstance(ifd, TiffFile):
+# 					ifd.load_raster()
+# 					ifd.save(fileobj)
+# 				elif isinstance(ifd, JpegFile):
+# 					ifd[0xffe1].save(fileobj)
+# 				data = fileobj.getvalue()
+# 				fileobj.close()
+# 				if len(data) > 0:
+# 					params["exif"] = b"Exif\x00\x00" + (data.encode() if isinstance(data, str) else data)
 
-			Image._image_.save(self, fp, format="JPEG", **params)
-	_Image.Image = Image
+# 			Image._image_.save(self, fp, format="JPEG", **params)
+# 	_Image.Image = Image
 
-	from PIL import JpegImagePlugin
-	JpegImagePlugin._getexif = _getexif
-	del _getexif
+# 	from PIL import JpegImagePlugin
+# 	JpegImagePlugin._getexif = _getexif
+# 	del _getexif
